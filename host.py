@@ -3,7 +3,7 @@ import socket
 import threading
 import time
 import select
-
+import random
 
 found_match = [False]
 
@@ -31,7 +31,7 @@ def wait_for_clients(ip_address):
     sock.bind((ip_address, 0))
     invites_thread = threading.Thread(target= invites, args=(sock.getsockname()[1],ip_address,))
     invites_thread.start()
-    print("port = {port}".format(port=sock.getsockname()[1]))
+    print("starting on port = {port}".format(port=sock.getsockname()[1]))
 
     number_of_players = 0
     player_sockets = []
@@ -44,16 +44,38 @@ def wait_for_clients(ip_address):
         print("Found player {player} !".format(player= number_of_players))
     found_match[0] = True
     sock.close()
-    print("found 2 players!")
     return player_sockets
+
+def generate_question():
+    answer = ""
+    scalar1 = random.randint(0, 9)
+    scalar2 = random.randint(0, 9)
+    operator_r = random.randint(0, 2)
+    operator = ""
+    if operator_r == 0:
+        operator = " + "
+        answer = str(scalar1 + scalar2)
+    elif operator_r == 1:
+        operator = " * "
+        answer = str(scalar1 * scalar2)
+    else:
+        operator = " - "
+        if scalar1 > scalar2:
+            answer = str(scalar1 - scalar2)
+        else:
+            temp = scalar1
+            scalar1 = scalar2
+            scalar2 = temp
+            answer = str(scalar2 - scalar1)
+    question = str(scalar1) + operator + str(scalar2)
+    return question, answer
 
 def game_mode(player_sockets):
     player1_socket = player_sockets[0]
     player2_socket = player_sockets[1]
     player1_name = player1_socket.recv(1024).decode()
     player2_name = player2_socket.recv(1024).decode()
-    number_question = "2+2"
-    answer = "4"
+    number_question, answer = generate_question()
     welcome_string = "Welcome to Quick Maths.\nPlayer 1: {player1}\nPlayer 2: {player2}\n==".format(player1=player1_name, player2=player2_name)
     question_string = "\nPlease answer the following question as fast as you can:\nHow much is {question}?".format(question= number_question)
     timeout_string = "Connection timed-out, a draw."
