@@ -2,17 +2,19 @@ import socket
 import threading
 import sys
 
-#Wait for incoming data from server
-#.decode is used to turn the message in bytes to a string
+
 def receive(socket, signal):
-    while signal:
-        try:
-            data = socket.recv(1024)
-            print(data.decode("utf-8"))
-        except:
-            print("You have been disconnected from the server")
-            signal = False
-            break
+    try:
+        while signal:
+            try:
+                data = socket.recv(1024)
+                print(data.decode("utf-8"))
+            except:
+                print("You have been disconnected from the server")
+                signal = False
+                break
+    finally:
+        print("Stopped receiving from the server.")
 
 #Get host and port
 host = input("Host: ")
