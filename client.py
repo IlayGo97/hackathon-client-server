@@ -2,7 +2,7 @@ import scapy.all as scapy
 import struct
 import socket
 import threading
-
+UDP_ADDRESS = ('<broadcast>', 13117)
 # receives messages from the server and notifies if the server shutdown.
 def receive(socket, signal):
     try:
@@ -30,7 +30,7 @@ def look_for_game(my_ip: str):
     data, address = sock.recvfrom(512)
     (HOST_IP, trash) = address
     print("Received offer from {hostip}, attempting to connect...".format(hostip=HOST_IP))
-    (COOKIE, MESSAGE_TYPE, HOST_PORT) = struct.unpack('IbH', data)
+    (COOKIE, MESSAGE_TYPE, HOST_PORT) = struct.unpack('!IbH', data)
     sock.close()
     return HOST_IP, HOST_PORT
 
@@ -58,6 +58,7 @@ def main():
     inteface = input()
     try:
         my_ip = scapy.get_if_addr(inteface)
+        # my_ip = "172.99.0.78"
     except:
         print("Couldn't connect to " + inteface)
         return
