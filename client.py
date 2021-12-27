@@ -1,38 +1,24 @@
+import scapy.all as scapy
 import socket
 import threading
+import time
+import select
+import random
 import sys
 
-#Wait for incoming data from server
-#.decode is used to turn the message in bytes to a string
-def receive(socket, signal):
-    while signal:
-        try:
-            data = socket.recv(1024)
-            print(data.decode("utf-8"))
-        except:
-            print("You have been disconnected from the server")
-            signal = False
-            break
 
-#Get host and port
-host = input("Host: ")
-port = int(input("Port: "))
+def look_for_game(team_name):
+    pass
 
-#Attempt connection to server
-try:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((host, port))
-except:
-    print("Could not make a connection to the server")
-    input("Press enter to quit")
-    sys.exit(0)
+def game_mode():
+    pass
 
-#Create new thread to wait for data
-receiveThread = threading.Thread(target = receive, args = (sock, True))
-receiveThread.start()
+def main():
+    print("Enter a team name:\n")
+    team_name = input()
+    while True:
+        look_for_game(team_name)
 
-#Send data to server
-#str.encode is used to turn the string message into bytes so it can be sent across the network
-while True:
-    message = input()
-    sock.sendall(str.encode(message))
+
+if __name__ == '__main__':
+    main()

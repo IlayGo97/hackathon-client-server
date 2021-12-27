@@ -4,16 +4,16 @@ import threading
 import time
 import select
 import random
-
+import struct
 found_match = [False]
 
 def invites(SERVER_PORT: int, MY_IP: str):
     ENDIAN = 'little'
-    MAGICK_COOKIE = 0xabcddcba.to_bytes(4, ENDIAN)
-    MESSAGE_TYPE = 0x2.to_bytes(1, ENDIAN)
+    MAGICK_COOKIE = 0xabcddcba
+    MESSAGE_TYPE = 0x2
     INVITES_PORT = 13117
-    SERVER_PORT = SERVER_PORT.to_bytes(2, ENDIAN)
-    packet = MAGICK_COOKIE + MESSAGE_TYPE + SERVER_PORT
+    SERVER_PORT = SERVER_PORT
+    packet = struct.pack("ibh", MAGICK_COOKIE, MESSAGE_TYPE, SERVER_PORT)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -47,11 +47,9 @@ def wait_for_clients(ip_address):
     return player_sockets
 
 def generate_question():
-    answer = ""
     scalar1 = random.randint(0, 9)
     scalar2 = random.randint(0, 9)
     operator_r = random.randint(0, 2)
-    operator = ""
     if operator_r == 0:
         operator = " + "
         answer = str(scalar1 + scalar2)
