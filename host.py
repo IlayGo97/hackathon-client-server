@@ -23,14 +23,13 @@ found_match = [False]
 UDP_ADDRESS = ('<broadcast>', 13117)
 # a function for sending invites over the predetermined port.
 # runs on a different thread.
-def invites(SERVER_PORT: int, MY_IP: str):
+def invites(SERVER_PORT: int):
     MAGIC_COOKIE = 0xabcddcba
     MESSAGE_TYPE = 0x2
     INVITES_PORT = 13117
     packet = struct.pack('!IbH', MAGIC_COOKIE, MESSAGE_TYPE, SERVER_PORT)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    # sock.bind((MY_IP, 0))
     while not found_match[0]:
         sock.sendto(packet, UDP_ADDRESS)
         time.sleep(1)
@@ -41,7 +40,7 @@ def invites(SERVER_PORT: int, MY_IP: str):
 def wait_for_clients(ip_address):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind((ip_address, 0))
-    invites_thread = threading.Thread(target=invites, args=(sock.getsockname()[1], ip_address,))
+    invites_thread = threading.Thread(target=invites, args=(sock.getsockname()[1],))
     invites_thread.start()
     print("starting on port = {port}".format(port=sock.getsockname()[1]))
     number_of_players = 0

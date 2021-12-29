@@ -25,12 +25,18 @@ def look_for_game(my_ip: str):
     invites_port = 13117
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((my_ip, invites_port))
     print("Client started, listening for offer requests...")
-    data, address = sock.recvfrom(512)
-    (HOST_IP, trash) = address
-    print("Received offer from {hostip}, attempting to connect...".format(hostip=HOST_IP))
-    (COOKIE, MESSAGE_TYPE, HOST_PORT) = struct.unpack('!IbH', data)
+    while True:
+        data, address = sock.recvfrom(512)
+        (HOST_IP, trash) = address
+        print("Received offer from {hostip}, attempting to connect...".format(hostip=HOST_IP))
+        try:
+            (COOKIE, MESSAGE_TYPE, HOST_PORT) = struct.unpack('!IbH', data)
+            break
+        except:
+            print("Recieved bad invite, trying to find anothr...")
     sock.close()
     return HOST_IP, HOST_PORT
 
@@ -58,7 +64,6 @@ def main():
     inteface = input()
     try:
         my_ip = scapy.get_if_addr(inteface)
-        # my_ip = "172.99.0.78"
     except:
         print("Couldn't connect to " + inteface)
         return
